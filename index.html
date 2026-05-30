@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Din Tarixi — Pro Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0b14;
+  --bg2: #13111f;
+  --bg3: #1c1a2e;
+  --bg4: #252340;
+  --gold: #d4a853;
+  --gold2: #f0cc7a;
+  --teal: #4ecdc4;
+  --rose: #e05f6a;
+  --green: #56d99b;
+  --purple: #9b72cf;
+  --text: #e8e5f5;
+  --muted: #7a7890;
+  --border: rgba(255,255,255,0.07);
+  --card-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+.light-mode {
+  --bg: #f0eefc;
+  --bg2: #ffffff;
+  --bg3: #e8e4f8;
+  --bg4: #dcd8f0;
+  --text: #1a1830;
+  --muted: #7a7890;
+  --border: rgba(0,0,0,0.08);
+  --card-shadow: 0 8px 40px rgba(100,80,180,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;transition:background 0.3s,color 0.3s}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 5%,rgba(155,114,207,0.13) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(212,168,83,0.1) 0%,transparent 55%),radial-gradient(ellipse 40% 30% at 50% 50%,rgba(78,205,196,0.05) 0%,transparent 50%);pointer-events:none;z-index:0}
+.light-mode::before{background:radial-gradient(ellipse 70% 50% at 15% 5%,rgba(155,114,207,0.08) 0%,transparent 55%)}
+
+/* ── LAYOUT ── */
+.app{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:16px}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 0 24px;gap:12px;flex-wrap:wrap}
+.logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--gold2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.icon-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.icon-btn:hover{background:var(--bg4);border-color:var(--gold)}
+.icon-btn.active{background:rgba(212,168,83,0.15);border-color:var(--gold);color:var(--gold)}
+
+/* ── TABS (screens) ── */
+.screen{display:none}.screen.active{display:block}
+
+/* ── HOME SCREEN ── */
+.home-hero{text-align:center;padding:36px 20px 28px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(155,114,207,0.2),rgba(212,168,83,0.2));border:1px solid rgba(212,168,83,0.3);border-radius:50px;padding:6px 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);margin-bottom:20px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,7vw,68px);font-weight:700;line-height:1.05;background:linear-gradient(135deg,#fff 0%,var(--gold2) 50%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.hero-sub{color:var(--muted);font-size:15px;max-width:480px;margin:0 auto 36px}
+
+/* MODE CARDS */
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
+.mode-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:16px;padding:20px 16px;cursor:pointer;transition:all 0.22s;text-align:center}
+.mode-card:hover,.mode-card.sel{border-color:var(--gold);background:rgba(212,168,83,0.08)}
+.mode-card.sel{box-shadow:0 0 0 3px rgba(212,168,83,0.15)}
+.mode-icon{font-size:28px;display:block;margin-bottom:10px}
+.mode-title{font-weight:700;font-size:14px;margin-bottom:4px}
+.mode-desc{font-size:12px;color:var(--muted)}
+
+/* SETTINGS PANEL */
+.settings-panel{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px}
+.settings-title{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px;font-weight:700}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.toggle{position:relative;width:44px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bg4);border-radius:999px;cursor:pointer;transition:0.3s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:0.3s}
+.toggle input:checked+.toggle-slider{background:linear-gradient(90deg,var(--purple),var(--gold))}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px)}
+.timer-select{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+
+/* START BTN */
+.btn-start-big{display:block;width:100%;max-width:320px;margin:0 auto;background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;border:none;border-radius:16px;padding:18px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.5px;transition:all 0.22s;box-shadow:0 6px 28px rgba(155,114,207,0.35)}
+.btn-start-big:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(155,114,207,0.5)}
+
+/* ── STATS BAR ── */
+.statsbar{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 18px;margin-bottom:16px;flex-wrap:wrap}
+.prog-wrap{flex:1;min-width:120px}
+.prog-label{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.prog-bg{background:var(--bg4);border-radius:999px;height:6px;overflow:hidden}
+.prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--gold));transition:width 0.4s cubic-bezier(0.4,0,0.2,1)}
+.stat-chip{background:var(--bg3);border-radius:10px;padding:6px 12px;text-align:center;flex-shrink:0}
+.stat-chip .n{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;line-height:1}
+.stat-chip .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.stat-chip.c .n{color:var(--green)}
+.stat-chip.w .n{color:var(--rose)}
+.stat-chip.t .n{color:var(--gold)}
+
+/* TIMER */
+.timer-chip{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:6px 14px;font-size:14px;font-weight:700;font-family:'Cormorant Garamond',serif;flex-shrink:0;transition:border-color 0.3s}
+.timer-chip.warn{border-color:var(--rose);color:var(--rose);animation:timerPulse 1s ease infinite}
+.timer-chip.ok{color:var(--teal)}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tb-btn{background:var(--bg2);border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tb-btn:hover{border-color:var(--gold);color:var(--gold)}
+.tb-btn.on{background:rgba(212,168,83,0.12);border-color:var(--gold);color:var(--gold)}
+
+/* ── QUESTION CARD ── */
+.q-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px 28px 24px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:var(--card-shadow)}
+.q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--gold),var(--teal))}
+.q-number{font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.bookmark-star{cursor:pointer;font-size:16px;transition:transform 0.2s}
+.bookmark-star:hover{transform:scale(1.3)}
+.q-text{font-size:clamp(15px,2.3vw,18px);font-weight:600;line-height:1.65;color:var(--text);margin-bottom:24px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:14px;background:var(--bg3);border:1.5px solid var(--border);border-radius:13px;padding:13px 18px;cursor:pointer;transition:all 0.18s;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;line-height:1.5;width:100%}
+.opt:hover:not(:disabled){border-color:var(--gold);background:rgba(212,168,83,0.07);transform:translateX(3px)}
+.opt:disabled{cursor:default}
+.opt-letter{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);font-weight:700;font-size:12px;color:var(--gold);flex-shrink:0;transition:all 0.2s}
+.opt.correct{border-color:var(--green)!important;background:rgba(86,217,155,0.1)!important;animation:correctPop 0.4s ease}
+.opt.correct .opt-letter{background:var(--green);color:#fff;border-color:var(--green)}
+.opt.wrong{border-color:var(--rose)!important;background:rgba(224,95,106,0.1)!important;animation:wrongShake 0.4s ease}
+.opt.wrong .opt-letter{background:var(--rose);color:#fff;border-color:var(--rose)}
+.opt.reveal{border-color:var(--green)!important;background:rgba(86,217,155,0.07)!important}
+.opt.reveal .opt-letter{background:var(--green);color:#fff;border-color:var(--green)}
+@keyframes correctPop{0%{transform:scale(1)}40%{transform:scale(1.015)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* FEEDBACK */
+.feedback{display:none;margin-top:16px;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;align-items:flex-start;gap:10px;line-height:1.5}
+.feedback.show{display:flex}
+.feedback.c{background:rgba(86,217,155,0.12);color:var(--green);border:1px solid rgba(86,217,155,0.25)}
+.feedback.w{background:rgba(224,95,106,0.1);color:#f09098;border:1px solid rgba(224,95,106,0.25)}
+.feedback-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* EXPLANATION */
+.expl{display:none;margin-top:10px;padding:12px 18px;border-radius:12px;background:rgba(155,114,207,0.1);border:1px solid rgba(155,114,207,0.2);font-size:13px;color:#c4b0e8;line-height:1.6}
+.expl.show{display:block}
+
+/* NAV */
+.nav-row{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.nav-left{display:flex;gap:8px}
+.btn{padding:11px 24px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;letter-spacing:0.3px}
+.btn-ghost{background:var(--bg3);color:var(--muted);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff;box-shadow:0 4px 18px rgba(155,114,207,0.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(155,114,207,0.45)}
+.btn-primary:disabled{opacity:0.35;cursor:default;transform:none}
+.btn-skip{background:var(--bg3);color:var(--muted);border:1.5px solid var(--border);font-size:12px;padding:9px 16px}
+.btn-skip:hover{border-color:var(--rose);color:var(--rose)}
+
+/* MINI MAP */
+.minimap-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;display:none}
+.minimap-wrap.open{display:block}
+.minimap-title{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;font-weight:700}
+.minimap-grid{display:flex;flex-wrap:wrap;gap:5px}
+.mm-dot{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.15s;color:var(--muted)}
+.mm-dot:hover{border-color:var(--gold);color:var(--gold)}
+.mm-dot.answered-c{background:rgba(86,217,155,0.15);border-color:var(--green);color:var(--green)}
+.mm-dot.answered-w{background:rgba(224,95,106,0.15);border-color:var(--rose);color:var(--rose)}
+.mm-dot.current{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 2px rgba(212,168,83,0.25)}
+.mm-dot.bookmarked::after{content:'★';position:absolute;top:-4px;right:-4px;font-size:8px;color:var(--gold);background:var(--bg);border-radius:50%;width:12px;height:12px;display:flex;align-items:center;justify-content:center}
+.mm-dot{position:relative}
+
+/* SEARCH MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:flex-start;justify-content:center;padding-top:80px}
+.modal-overlay.open{display:flex}
+.search-modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:600px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:modalIn 0.25s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.search-input{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;font-size:15px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;margin-bottom:14px}
+.search-input:focus{border-color:var(--gold)}
+.search-results{max-height:380px;overflow-y:auto}
+.search-item{padding:12px 14px;border-radius:10px;cursor:pointer;transition:background 0.15s;font-size:13px;line-height:1.5;border-bottom:1px solid var(--border)}
+.search-item:hover{background:var(--bg3)}
+.search-item:last-child{border-bottom:none}
+.search-item .si-num{color:var(--gold);font-weight:700;font-size:11px;margin-bottom:3px}
+.search-item .si-q{color:var(--text);font-weight:600}
+.search-num-badge{display:inline-block;background:rgba(212,168,83,0.15);color:var(--gold);border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;margin-right:6px}
+
+/* BOOKMARK SCREEN */
+.bookmark-empty{text-align:center;padding:48px;color:var(--muted)}
+.bookmark-list{display:flex;flex-direction:column;gap:10px}
+.bm-item{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.bm-item-q{font-size:14px;font-weight:600;line-height:1.5;flex:1}
+.bm-item-num{font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px}
+.bm-go{background:var(--bg3);border:1px solid var(--border);color:var(--gold);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all 0.2s}
+.bm-go:hover{background:rgba(212,168,83,0.12)}
+.bm-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;transition:color 0.2s}
+.bm-del:hover{color:var(--rose)}
+
+/* RESULTS SCREEN */
+.result-wrap{text-align:center;padding:36px 20px}
+.result-circle{width:140px;height:140px;border-radius:50%;margin:0 auto 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.result-circle svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.result-circle-inner{position:relative;z-index:1}
+.result-pct{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;line-height:1}
+.result-pct-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.result-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;margin-bottom:8px}
+.result-sub{color:var(--muted);margin-bottom:28px;font-size:15px}
+.result-stats-grid{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:32px}
+.rs-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:18px 24px;min-width:100px}
+.rs-card .big{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;line-height:1}
+.rs-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:5px}
+.rs-card.c .big{color:var(--green)}
+.rs-card.w .big{color:var(--rose)}
+.rs-card.t .big{color:var(--gold)}
+
+/* SECTION BREAKDOWN */
+.breakdown{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:24px;text-align:left}
+.bd-title{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:16px;font-weight:700}
+.bd-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:13px}
+.bd-bar-bg{flex:1;background:var(--bg4);border-radius:999px;height:6px;overflow:hidden}
+.bd-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--gold))}
+.bd-pct{width:36px;text-align:right;font-weight:700;font-size:12px;color:var(--gold)}
+
+.result-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.btn-result{padding:13px 28px;border-radius:13px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s}
+.btn-result.primary{background:linear-gradient(135deg,var(--gold),var(--purple));color:#fff;box-shadow:0 4px 20px rgba(155,114,207,0.3)}
+.btn-result.primary:hover{transform:translateY(-2px)}
+.btn-result.ghost{background:var(--bg3);color:var(--text);border:1.5px solid var(--border)}
+.btn-result.ghost:hover{border-color:var(--gold)}
+
+/* WRONG REVIEW */
+.review-list{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+.rev-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.rev-num{font-size:11px;color:var(--gold);font-weight:700;margin-bottom:6px}
+.rev-q{font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.5}
+.rev-correct{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--green)}
+.rev-your{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--rose);margin-top:4px}
+.rev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:999px}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .q-card{padding:20px 16px}
+  .statsbar{gap:6px;padding:10px 14px}
+  .app{padding:10px}
+  .result-stats-grid{gap:8px}
+  .rs-card{padding:14px 16px;min-width:80px}
+}
+
+/* SLIDE ANIM */
+@keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideBack{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+.slide-in{animation:slideIn 0.3s ease}
+.slide-back{animation:slideBack 0.3s ease}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 22px;border-radius:12px;font-size:13px;font-weight:600;z-index:999;opacity:0;pointer-events:none;transition:opacity 0.3s;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* SCREEN NAV TABS */
+.screen-tabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:18px}
+.stab{flex:1;padding:8px 12px;border-radius:9px;font-size:12px;font-weight:700;text-align:center;cursor:pointer;color:var(--muted);transition:all 0.2s;border:none;background:transparent;font-family:'DM Sans',sans-serif}
+.stab.on{background:linear-gradient(135deg,var(--purple),var(--gold));color:#fff}
+
+/* PULSE dot for bookmarks count */
+.bm-count{display:inline-block;background:var(--gold);color:#0c0b14;border-radius:999px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:4px}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo">📿 Din Tarixi</div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="btnSearch" title="Qidirish" onclick="openSearch()">🔍</button>
+      <button class="icon-btn" id="btnBookmarks" onclick="showTab('bookmarks')">⭐ <span class="bm-count" id="bmCount">0</span></button>
+      <button class="icon-btn" id="btnTheme" onclick="toggleTheme()" title="Tema">🌙</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: HOME -->
+  <div class="screen active" id="screenHome">
+    <div class="home-hero">
+      <div class="hero-badge">📚 Imtihon Tayyorlash Tizimi</div>
+      <div class="hero-title">Din Tarixi<br>Pro Test</div>
+      <div class="hero-sub">179 ta savol · Intelligent tahlil · Xatolar bo'yicha takrorlash · Bookmark · Timer</div>
+    </div>
+
+    <div class="mode-grid" id="modeGrid">
+      <div class="mode-card sel" onclick="selMode(this,'all')">
+        <span class="mode-icon">📖</span>
+        <div class="mode-title">To'liq test</div>
+        <div class="mode-desc">179 ta savol</div>
+      </div>
+      <div class="mode-card" onclick="selMode(this,'50')">
+        <span class="mode-icon">⚡</span>
+        <div class="mode-title">50 ta savol</div>
+        <div class="mode-desc">Tasodifiy aralash</div>
+      </div>
+      <div class="mode-card" onclick="selMode(this,'25')">
+        <span class="mode-icon">🎯</span>
+        <div class="mode-title">25 ta savol</div>
+        <div class="mode-desc">Tez tekshirish</div>
+      </div>
+      <div class="mode-card" onclick="selMode(this,'bookmarked')">
+        <span class="mode-icon">⭐</span>
+        <div class="mode-title">Bookmarklar</div>
+        <div class="mode-desc">Saqlangan savollar</div>
+      </div>
+      <div class="mode-card" onclick="selMode(this,'wrong')">
+        <span class="mode-icon">🔁</span>
+        <div class="mode-title">Xatolar</div>
+        <div class="mode-desc">Oxirgi xato javoblar</div>
+      </div>
+    </div>
+
+    <div class="settings-panel">
+      <div class="settings-title">⚙️ Test sozlamalari</div>
+      <div class="settings-row">
+        <div class="settings-label">⏱ Timer</div>
+        <select class="timer-select" id="timerSelect">
+          <option value="0">O'chirilgan</option>
+          <option value="20">20 soniya</option>
+          <option value="30" selected>30 soniya</option>
+          <option value="60">1 daqiqa</option>
+          <option value="90">1.5 daqiqa</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">🔀 Javoblarni aralashtirish</div>
+        <label class="toggle"><input type="checkbox" id="shuffleOpts" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">🗺 Savol xaritasi</div>
+        <label class="toggle"><input type="checkbox" id="showMap"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">📝 Izohlari ko'rsatish</div>
+        <label class="toggle"><input type="checkbox" id="showExpl"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <button class="btn-start-big" onclick="startQuiz()">▶ Testni Boshlash</button>
+  </div>
+
+  <!-- SCREEN: QUIZ -->
+  <div class="screen" id="screenQuiz">
+    <div class="statsbar">
+      <div class="prog-wrap">
+        <div class="prog-label">Ilgarilanish</div>
+        <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="stat-chip t"><div class="n" id="sc1">1</div><div class="l">Savol</div></div>
+      <div class="stat-chip c"><div class="n" id="sc2">0</div><div class="l">To'g'ri</div></div>
+      <div class="stat-chip w"><div class="n" id="sc3">0</div><div class="l">Xato</div></div>
+      <div class="timer-chip ok" id="timerChip" style="display:none">⏱ 30</div>
+    </div>
+
+    <div class="toolbar">
+      <button class="tb-btn" id="btnMap" onclick="toggleMap()">🗺 Xarita</button>
+      <button class="tb-btn" onclick="openSearch()">🔍 Qidirish</button>
+      <button class="tb-btn" id="btnSkipWrong" onclick="goToNextWrong()">⚠️ Keyingi xato</button>
+      <button class="tb-btn" id="btnPause" onclick="pauseTimer()">⏸ Pauza</button>
+      <button class="tb-btn" onclick="showTab('home')">🏠 Bosh</button>
+    </div>
+
+    <div class="minimap-wrap" id="minimap">
+      <div class="minimap-title">Savol xaritasi</div>
+      <div class="minimap-grid" id="minimapGrid"></div>
+    </div>
+
+    <div class="q-card" id="qCard">
+      <div class="q-number">
+        <span id="qNum">Savol 1 / 179</span>
+        <span class="bookmark-star" id="bmStar" onclick="toggleBookmark()">☆</span>
+        <span style="flex:1"></span>
+        <span style="font-size:11px;color:var(--muted)" id="qCategory"></span>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="feedback">
+        <span class="feedback-icon" id="fbIcon"></span>
+        <span id="fbText"></span>
+      </div>
+      <div class="expl" id="expl"></div>
+    </div>
+
+    <div class="nav-row">
+      <div class="nav-left">
+        <button class="btn btn-ghost" onclick="navQ(-1)" id="prevBtn">← Orqaga</button>
+        <button class="btn btn-skip" onclick="skipQuestion()" id="skipBtn">⏭ O'tkazib yuborish</button>
+      </div>
+      <button class="btn btn-primary" onclick="navQ(1)" id="nextBtn" disabled>Keyingi →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: BOOKMARKS -->
+  <div class="screen" id="screenBookmarks">
+    <div class="screen-tabs">
+      <button class="stab" onclick="showTab('home')">🏠 Bosh sahifa</button>
+      <button class="stab on">⭐ Bookmarklar</button>
+      <button class="stab" onclick="showTab('review')">🔁 Xatolar</button>
+    </div>
+    <div id="bookmarkContent"></div>
+  </div>
+
+  <!-- SCREEN: REVIEW -->
+  <div class="screen" id="screenReview">
+    <div class="screen-tabs">
+      <button class="stab" onclick="showTab('home')">🏠 Bosh sahifa</button>
+      <button class="stab" onclick="showTab('bookmarks')">⭐ Bookmarklar</button>
+      <button class="stab on">🔁 Xatolar</button>
+    </div>
+    <div id="reviewContent"></div>
+  </div>
+
+  <!-- SCREEN: RESULTS -->
+  <div class="screen" id="screenResults">
+    <div class="result-wrap">
+      <div class="result-circle" id="resultCircle">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="var(--bg4)" stroke-width="10"/>
+          <circle cx="70" cy="70" r="60" fill="none" stroke="url(#rg)" stroke-width="10" stroke-linecap="round" id="resultArc" stroke-dasharray="377" stroke-dashoffset="377"/>
+          <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="var(--purple)"/><stop offset="100%" stop-color="var(--gold)"/></linearGradient></defs>
+        </svg>
+        <div class="result-circle-inner">
+          <div class="result-pct" id="rPct">0%</div>
+          <div class="result-pct-lbl">Ball</div>
+        </div>
+      </div>
+      <div class="result-title" id="rTitle"></div>
+      <div class="result-sub" id="rSub"></div>
+      <div class="result-stats-grid">
+        <div class="rs-card c"><div class="big" id="rC">0</div><div class="lbl">To'g'ri</div></div>
+        <div class="rs-card w"><div class="big" id="rW">0</div><div class="lbl">Xato</div></div>
+        <div class="rs-card t"><div class="big" id="rT">0</div><div class="lbl">Jami</div></div>
+        <div class="rs-card"><div class="big" id="rSkip" style="color:var(--muted)">0</div><div class="lbl">O'tkazildi</div></div>
+      </div>
+      <div class="breakdown" id="breakdown" style="display:none">
+        <div class="bd-title">📊 Bo'limlar bo'yicha tahlil</div>
+        <div id="bdRows"></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn-result primary" onclick="startQuiz()">🔄 Qayta urinish</button>
+        <button class="btn-result ghost" onclick="showTab('review')">🔍 Xatolarni ko'rish</button>
+        <button class="btn-result ghost" onclick="showTab('home')">🏠 Bosh sahifa</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- SEARCH MODAL -->
+<div class="modal-overlay" id="searchModal" onclick="closeSearch(event)">
+  <div class="search-modal" onclick="event.stopPropagation()">
+    <input class="search-input" id="searchInput" placeholder="Savol matni yoki raqami bo'yicha qidiring..." oninput="doSearch()" autofocus>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const ALL_Q = [
+  {q:"Olimlar muayyan etiqod din deb atalishi uchun quyidagi qaysi uch asosiy xususiyatga ega bo'lishi lozimligini ta'kidlaydilar?",opts:["1,2,3 – G'ayritabiiy iloh, Kult, Diniy tashkilot","1,3,5 – G'ayritabiiy iloh, Tashkilot, Diniy guruhlar","3,4,5 – Tashkilot, Rahbar, Guruhlar","1,4,5 – G'ayritabiiy iloh, Rahbar, Guruhlar"],ans:0,cat:"Asoslar"},
+  {q:"Mavjud dinlardagi Xudo haqidagi tasavvurlarni shartli ravishda qanday ikkiga guruhga bo'lish mumkin?",opts:["Transsendent va Immanent","Haqiqiy va soxta","Tialogia va tiasofiya","Milliy va Jahon"],ans:0,cat:"Asoslar"},
+  {q:"Insonlar olamidan tashqarida, insonlarga hech qanday aloqasi bo'lmagan, qusur va nuqsonlardan xoli Xudolar qanday nomlanadi?",opts:["Transsendent ilohlar","Immanent ilohlar","Antropomorf ilohlar","Zooantropomorf ilohlar"],ans:0,cat:"Asoslar"},
+  {q:"Tabiatning bir bo'lagi sifatida tasavvur qilingan, insonlarga o'xshab ketadigan Xudolar?",opts:["Immanent ilohlar","Transsendent ilohlar","Antropomorf ilohlar","Zooantropomorf ilohlar"],ans:0,cat:"Asoslar"},
+  {q:"Xudoning mohiyati va irodasi haqidagi diniy ta'limotlar majmui nima deyiladi?",opts:["Teologiya","Teosofiya","Filosofiya","Diniy etiqod"],ans:0,cat:"Asoslar"},
+  {q:"Antropomorf xudolar qiyofasi qanday bo'ladi?",opts:["Inson qiyofasida","Yarim odam yarim hayvon qiyofasida","Hayvon qiyofasida","Inson olamidan tashqarida"],ans:0,cat:"Asoslar"},
+  {q:"Zooantropomorf xudolar deganimiz qaysi?",opts:["Yarim odam yarim hayvon qiyofasida","Inson qiyofasida","Hayvon qiyofasida","Inson olamidan tashqarida"],ans:0,cat:"Asoslar"},
+  {q:"Dinning qaysi funksiyasi o'z dinidagilar uchun to'ldiruvchi, ovutuvchi vazifasini bajaradi?",opts:["Kompensatorlik","Integrativlik","Regulyativlik","Kommunikativ"],ans:0,cat:"Din funksiyalari"},
+  {q:"Dinning qaysi funksiyasi ta'limot tizimini vujudga keltirib, unga e'tiqod qiluvchi shaxs jamoani shu ta'limot doirasida saqlaydi?",opts:["Integrativlik","Kompensatorlik","Regulyativlik","Kommunikativ"],ans:0,cat:"Din funksiyalari"},
+  {q:"Dinning qaysi funksiyasi dindorlar hayotini tartibga solish, nazorat qilish funksiyasini bajaradi?",opts:["Regulyativlik","Kompensatorlik","Integrativlik","Kommunikativ"],ans:0,cat:"Din funksiyalari"},
+  {q:"E'tiqod qiluvchilar soniga ko'ra birinchi o'rinda turuvchi jahon dini?",opts:["Xristianlik","Buddizm","Islom","Hinduizm"],ans:0,cat:"Jahon dinlari"},
+  {q:"Dinlar ta'limotiga ko'ra qanaqa turlarga bo'linadi?",opts:["Monoteistik va Politeistik","Ilohiy va tabiiy","Jahon va milliy","Uru-qabila va milliy"],ans:0,cat:"Asoslar"},
+  {q:"Jon va ruhlarga sig'inish bo'lib, hali qabila jamoalari shakllanmagan davrlarda paydo bo'lgan din?",opts:["Animizm","Totemizm","Fetishizm","Shamanizm"],ans:0,cat:"Ibtidoiy dinlar"},
+  {q:"Qaysi atama birinchi marta 1791 yilda Jon Long tomonidan insonning hayvon va o'simliklar bilan qon-qarindoshligi haqidagi ishonchni anglatuvchi so'z sifatida qo'llangan?",opts:["Totemizm","Animizm","Fetishizm","Shamanizm"],ans:0,cat:"Ibtidoiy dinlar"},
+  {q:"Portugalizcha 'sehrlangan buyum, narsa, tumor' ma'nosini beruvchi – But va tumorlar g'ayritabiiy qudrat timsoli sifatida tasavvur qilingan so'z?",opts:["Fetishizm","Animizm","Totemizm","Shamanizm"],ans:0,cat:"Ibtidoiy dinlar"},
+  {q:"Bir millatga mansub xalqlar e'tiqod qiladigan dinlar bu?",opts:["Milliy dinlar","Jahon dinlari","Uru-qabila dinlari","Milliy va Uru-qabila dinlari"],ans:0,cat:"Asoslar"},
+  {q:"Eramizdan avvalgi 2000 yillarning oxirlarida Falastinda vujudga kelib, yakkaxudolik g'oyasini targ'ib qilgan din qaysi?",opts:["Iudaizm","Xristianlik","Buddizm","Hinduizm"],ans:0,cat:"Yahudiylik"},
+  {q:"Musoga Tur tog'ida berilgan muqaddas kitob bu?",opts:["Tavrot","Zabur","Tripitaka","Qur'on"],ans:0,cat:"Yahudiylik"},
+  {q:"Yahudiylikdagi qadimiy oqimlar qaysilar? (1-Saduqiylar, 2-Farziylar, 3-Yesseylar)",opts:["1,2,3","1,2,4","1,4,5","2,4,5"],ans:0,cat:"Yahudiylik"},
+  {q:"Yahudiylikdagi zamonaviy oqimlar qaysilar? (4-Massonizm, 5-Sionizm)",opts:["4,5","2,3","1,4","3,4"],ans:0,cat:"Yahudiylik"},
+  {q:"Vedalar qanday qismlarga bo'linadi?",opts:["Rig veda, Yajur veda, Sama veda va Atxarba veda","Eski veda va yangi veda","Qadimiy veda va zamonaviy veda","Ramayana va Maxobxorad"],ans:0,cat:"Hinduizm"},
+  {q:"Braxmanlik ta'limoti kastalarga asoslangan bo'lib quyidagi to'rt tabaqaga bo'linadi?",opts:["Braxmanlar, Kshatriylar, Vayshlar, Shudralar","Kshatrilar, Vayshlar, Shudralar, Oriylar, Vishnuiylar","Braxmanlar, Vayshlar, Oriylar, Vishnuiylar","Braxmanlar, Kshatriylar, Shudralar, Oriylar, Vishnuiylar"],ans:0,cat:"Hinduizm"},
+  {q:"Hinduizm ta'limoti qanday oqimlarga bo'linadi?",opts:["Vishnuizm va Shivaizm","Braxmanlik va Kshatriy","Shudralar va Shivaizm","Vishnuizm va Braxmanlik"],ans:0,cat:"Hinduizm"},
+  {q:"Jaynizm dinining asoschisi sifatida e'tiqod qilinadigan yarim afsonaviy payg'ambar kimning nomi bilan atalgan?",opts:["Jina","Jabroyil","Yahve","Gautama"],ans:0,cat:"Hinduizm"},
+  {q:"Jaynizm dini qachon paydo bo'lgan?",opts:["Eramizdan oldingi VI asr","Eramizdan oldingi VII asr","Eramizdan oldingi VIII asr","Eramizdan oldingi XI asr"],ans:0,cat:"Hinduizm"},
+  {q:"Jaynizm dinining oqimlari?",opts:["Shvetambarlar va Digambarlar","Katolik va Pravoslav","Xinayana va Maxayana","Vishnuizm va Shivaizm"],ans:0,cat:"Hinduizm"},
+  {q:"Sikxizm dinining asoschisi?",opts:["Nanak","Braxman","Shiva","Jina"],ans:0,cat:"Milliy dinlar"},
+  {q:"Sikxizm ta'limotining muqaddas kitobi qaysi?",opts:["Grant Sohib","Bibliya","Zabur","Veda"],ans:0,cat:"Milliy dinlar"},
+  {q:"Sintoizm dinining bosh xudosi?",opts:["Amaterasu","Braxman","Shiva","Yahve"],ans:0,cat:"Milliy dinlar"},
+  {q:"Sintoizmning muqaddas kitobi qaysi?",opts:["Kodziki","Dao-Deszin","Adina grand","Zabur"],ans:0,cat:"Milliy dinlar"},
+  {q:"Zardushtiylik dinining muqaddas kitobi?",opts:["Avesto","Dao-Deszin","Adina grand","Zabur"],ans:0,cat:"Zardushtiylik"},
+  {q:"Buddaviylik dinining asoschisi?",opts:["Siddxarta Gautama","Nanak","Vishnu","Yahve"],ans:0,cat:"Buddaviylik"},
+  {q:"Buddaviylik dinining muqaddas kitobi qaysi?",opts:["Tripitaka","Dao-Deszin","Adina grand","Zabur"],ans:0,cat:"Buddaviylik"},
+  {q:"Buddaning beshta biografiyasi to'g'ri ko'rsatilgan qatorni toping? (1-Maxavostu 2-Lalitavistara 3-Buddaxacharita 4-Nidanakatxa 5-Abnixishkramansutra)",opts:["1,2,3,4,5","2,3,4,5,6","1,3,4,5,6","1,2,3,5,6"],ans:0,cat:"Buddaviylik"},
+  {q:"Buddaviylikda qanday oqimlar mavjud?",opts:["Xinayana, Maxayana va Lamaizm","Lamaizm va Hinduizm","Xinayana va Jaynizm","Xinayana va Xristianlik"],ans:0,cat:"Buddaviylik"},
+  {q:"Xristianlik dini nechanchi yili imperator Konstantin buyrug'iga binoan davlat dini deb e'lon qilindi?",opts:["324-yil","325-yil","326-yil","327-yil"],ans:0,cat:"Xristianlik"},
+  {q:"Rusda pravoslavlik qachon paydo bo'lgan?",opts:["988-yilda","395-yilda","1448-yilda","1054-yilda"],ans:0,cat:"Xristianlik"},
+  {q:"Daoizm qanday din?",opts:["Genoteistik","Monoteistik","Politeistik","Panteistik"],ans:0,cat:"Milliy dinlar"},
+  {q:"Talmud qaysi dinning muqaddas kitoblaridan biridir?",opts:["Buddaviylik","Nasroniylik","Islom","Yahudiylik"],ans:3,cat:"Yahudiylik"},
+  {q:"Buddaviylikda dinga ishongan kishining asosiy maqsadi nima?",opts:["Nirvanaga erishish","«Muqaddas qadamjolar»ga sig'inish","Rohiblikni qabul qilish","Qayta tug'ilish zanjiridan o'tish"],ans:0,cat:"Buddaviylik"},
+  {q:"Injil (Bibliya) qanday qismlardan iborat?",opts:["Besh kitob, Apokalipsis","To'rt Yevangeliya","Eski ahd va Yangi ahd","Yangi ahd"],ans:2,cat:"Xristianlik"},
+  {q:"Nasroniylik marosimchiligining muhim elementlari?",opts:["Rojdestvo, Pasxa, Pyatidesatnitsa, Troitsa","Xudoning gavdalanishi, gunohi yuvish, qayta tirilish","Liturgiya, messa, soborovanie, ensiklika, indulgensiya","Cho'qintirish, miro surtish, poklanish, tavba, nikoh, ruhoniylikka fotiha"],ans:3,cat:"Xristianlik"},
+  {q:"Pravoslavlikdagi mustaqil cherkovlar nima deb ataladi?",opts:["Modernistik cherkovlar","Ortodoksal cherkovlar","Avtokefal cherkovlar","Monofizit cherkovlar"],ans:2,cat:"Xristianlik"},
+  {q:"Katolitsizmda Iso Masihning yerdagi noibi deb kim hisoblanadi?",opts:["Rim Papasi","Vatikan","Cherkov","Kardinallar"],ans:0,cat:"Xristianlik"},
+  {q:"Protestant sektalarini aniqlang:",opts:["Baptizm, vahhobyilik, anglikanlik, sintoizm, bobizm, lamaizm","Lyuteranlik, kalvinistlar, anglikanlik, bahoiylik, bobiylik, lamaizm","Baptizm, pyatidesyatniklar, adventistlar, mennomentlar, Iegova shohidlari, metodizm","Pyatidesatniklar, zardushtiylik, hinduiylik, Iegova shohidlari, kalvinizm"],ans:2,cat:"Xristianlik"},
+  {q:"Islom dini qachon paydo bo'ldi?",opts:["Eramizgacha 5 asrda","Eramizning 1 asrida","Eramizning 6 asrida","Eramizning 7 asrida"],ans:3,cat:"Islom"},
+  {q:"Islomning qanday asosiy yo'nalishi bor?",opts:["Sunniylik va shialik","Modernizm va fundamentalizm","Ismoiliylik va vahhobyilik","Bahoiylik va bobiylik"],ans:0,cat:"Islom"},
+  {q:"Hinduiylik ta'limotiga ko'ra olam, hayotning barcha shaklini qaysi xudo yaratgan?",opts:["Braxma","Shiva","Vishnu","Adita"],ans:0,cat:"Hinduizm"},
+  {q:"Buddaviylik dini qachon paydo bo'ldi?",opts:["Eramizning V asrida","Eramizning I asrida","Eramizgacha VI asrida","Eramizgacha XIII asrida"],ans:2,cat:"Buddaviylik"},
+  {q:"Nasroniylik qachon paydo bo'ldi?",opts:["Eramizning 1 asrida","Eramizgacha 1 asrda","Eramizgacha 4 asrda","Eramizning 5 asrida"],ans:0,cat:"Xristianlik"},
+  {q:"Sharq dinlaridan qaysi biri nasroniylikka eng ko'p ta'sir ko'rsatdi?",opts:["Buddaviylik","Zardushtiylik","Islom","Yahudiylik"],ans:3,cat:"Xristianlik"},
+  {q:"Buddaviylikning asosiy aqidasi nimadan iborat?",opts:["Gunoh","Itoatkorlik","Nirvana","Azob-uqubat"],ans:3,cat:"Buddaviylik"},
+  {q:"Nasroniylikda ikkinchi bo'linish eramizning qaysi asrida bo'lgan?",opts:["XVI asrda","V asrda","XI asrda","I asrda"],ans:0,cat:"Xristianlik"},
+  {q:"Yahudiylik dinining asosiy aqidasi nimaga bo'lgan ishonchdan iborat?",opts:["Messiyaning kelishiga","Oxiratga","Yahudiy xalqi xudo tomonidan tanlanganligi","Yagona xudo Yahvega"],ans:3,cat:"Yahudiylik"},
+  {q:"Dinning ijtimoiy ildizlari nima?",opts:["Ishlab chiqaruvchi kuchlarning sust rivojlanganligi oqibati","Kishilarning bir-birlariga bo'lgan munosabatlarning chegaralanganligining oqibati","Dindorlikni keltirib chiqaruvchi va takrorlab turishi uchun imkoniyat yaratuvchi ijtimoiy hayotning ob'ektiv omillari","Tushunchalar bilan ob'ektiv olamdagi muayyan narsa va hodisalarning mos kelmasligi"],ans:2,cat:"Asoslar"},
+  {q:"Eng qadimgi jahon dini qaysi?",opts:["Nasroniylik","Islom","Buddaviylik","Yahudiylik"],ans:2,cat:"Jahon dinlari"},
+  {q:"E'tiqod qiluvchilarning miqdori jihatidan eng katta din qaysi?",opts:["Islom","Buddaviylik","Nasroniylik","Yahudiylik"],ans:2,cat:"Jahon dinlari"},
+  {q:"Lamaizm buddaviylikning yo'nalishlaridan biri sifatida eramizning qaysi asrida shakllandi?",opts:["Eramizdan aval I-II","I-II","VII-IX","XX-XXI"],ans:2,cat:"Buddaviylik"},
+  {q:"Diniy tashkilot nima?",opts:["Asosiy diniy yo'nalishning ichidagi oppozitsion oqimlar","G'ayritabiiy kuchlarga ishonch tufayli paydo bo'lgan g'oyalar va obrazlarning yig'indisi","Diniy tasavvurlar sistemasi bilan bog'lanmagan maxsus xatti-harakatlar majmuasi","Diniy e'tiqodlar va marosimlar umumiyligi asosida bir dinga ishonuvchilar uyushmasi"],ans:3,cat:"Asoslar"},
+  {q:"Dinning ijtimoiy vazifasi nima?",opts:["Dunyoqarash","Aloqa","Ibodat qiluvchilik","Birlashtirish"],ans:3,cat:"Din funksiyalari"},
+  {q:"Atrof olamdagi narsalarda ruh bor deb e'tiqod qilish qaysi dinning xususiyati?",opts:["Animizm","Totemizm","Sehrgarlik","Fetishizm"],ans:0,cat:"Ibtidoiy dinlar"},
+  {q:"Dinning asosiy tarixiy turlari quyidagilardan qaysi biri?",opts:["Uru-qabila, milliy va jahon dinlari","Uru-qabilaviy, millat, davlat va dunyoviy","Dastlabki, davlat va hozirgi","Buddaviylik, nasroniylik va islom"],ans:0,cat:"Asoslar"},
+  {q:"Tabiatni ilohiylashtirishning mohiyati nima?",opts:["Dehqonchilikka ta'sir qiluvchi tabiat hodisalarini g'ayritabiiy xususiyatlarga ega deb ko'rsatish","Odamlar va ularning o'lgan ajdodlari o'rtasida g'ayritabiiy aloqalarning saqlanishiga bo'lgan ishonch","Qabila boshliqlarida g'ayritabiiy qobiliyatlar borligiga ishonch","Odamlar voqelikning turli ob'ektlarini g'ayritabiiy xususiyatlarga ega deb ilohiylashtirish"],ans:3,cat:"Ibtidoiy dinlar"},
+  {q:"Jahonda e'tiqod qiluvchilar soni jihatidan eng katta milliy din qaysi?",opts:["Yahudiylik","Xristianlik","Islom","Hinduiylik"],ans:3,cat:"Milliy dinlar"},
+  {q:"Sikxiylik dinining asoschisi kim?",opts:["Vishnu","Shiva","Nanak","Braxma"],ans:2,cat:"Milliy dinlar"},
+  {q:"Konfutsiychilik ta'limotida qaysi muammolar asosiy o'rin tutadi?",opts:["Siyosiy","Falsafiy","Estetik","Ijtimoiy-axloqiy va siyosiy"],ans:3,cat:"Milliy dinlar"},
+  {q:"Sintoizmning bosh xudosi kim?",opts:["Oxirgi payg'ambar Jina","Saqlovchi xudo Vishnu","Quyosh ma'budasi Amaterasu","Yaratuvchi xudo Braxma"],ans:2,cat:"Milliy dinlar"},
+  {q:"Nasroniylik qachon Rim imperiyasining davlat diniga aylandi?",opts:["Eramizning IV asrida","Eramizning I asrida","Eramizning XI asrida","Eramizning II asrida"],ans:0,cat:"Xristianlik"},
+  {q:"G'arb va Sharq nasroniylari o'rtasidagi bo'linish qachon sodir bo'ldi?",opts:["451 yilda","325 yilda","1526 yilda","1054 yilda"],ans:3,cat:"Xristianlik"},
+  {q:"Rim papasining barcha katolik xristianlar uchun qaratilgan maktubi nima deb ataladi?",opts:["Ensiklika","Ezgulik","Indulgensiya","Inauguratsiya"],ans:0,cat:"Xristianlik"},
+  {q:"Muhammad (s.a.v.) qachon o'zini Allohning elchisi deb e'lon qildi?",opts:["622 yilda","570 yilda","610 yilda","632 yilda"],ans:2,cat:"Islom"},
+  {q:"Islomda kimlar xulafoi roshidin deb hisoblanadi?",opts:["Muhammad, Ali, Hasan, Husayn","Abu Hurayra, Ibn Xanbal, Ibn Hoshim","Abu Bakr, Umar, Usmon, Ali","Ibrohim, Muso, Iso, Dovud"],ans:2,cat:"Islom"},
+  {q:"Qurbon hayiti qachon bayram qilinadi?",opts:["Ro'zadan 70 kun oldin","Ro'zadan 3 kun oldin","Ro'za tugagandan boshlab 70 kundan so'ng","Ro'za tugagandan boshlab 100 kundan so'ng"],ans:2,cat:"Islom"},
+  {q:"Shialikda muqaddas hadislar nima deb ataladi?",opts:["Kalom","Fiqh","Axbor","Ashuro kunlari"],ans:2,cat:"Islom"},
+  {q:"Odamlarning xudo oldida tengligi g'oyasi islomda qanday xarakter kasb etadi?",opts:["Gunohdagi tenglik","Azob-uqubatda tenglik","Muhabbatda tenglik","Itoatdagi tenglik"],ans:3,cat:"Islom"},
+  {q:"'Skeptitsizm' nima?",opts:["Cherkovning rasmiy doktrinasidan farq qiluvchi diniy ta'limot","Dinning u yoki bu qoidalarini shubha ostiga olish yoki ishonchsizlik bilan qaramoq","Cherkovning jamiyat hayotidagi rolini kuchaytirish talab qiluvchi oqim","Diniy tasavvurlar va umuman dinni inkor qiluvchi qarashlar sistemasi"],ans:1,cat:"Asoslar"},
+  {q:"Kreatsionizm nima?",opts:["Voqelik hodisalarining maqsadga muvofiqligi haqidagi diniy ta'limot","Xudo olamni yaratibgina qolmay, uni to'liq boshqarishi haqidagi ta'limot","Olamning yo'qdan yaratilganligi haqidagi diniy ta'limot","Insonni ilohiy ijodning gultoji deb hisoblovchi diniy tashkilot"],ans:2,cat:"Asoslar"},
+  {q:"Esxatologiya nima?",opts:["Afsonaning mohiyatini ochib beruvchi fan","Insonning kelib chiqishi va rivojlanishi haqidagi fan","Odamni xudo yo'qdan yaratilganligi haqidagi diniy ta'limot","Dunyo va insonning oxir-oqibatdagi taqdiri haqidagi diniy ta'limot"],ans:3,cat:"Asoslar"},
+  {q:"Diniy modernizm nima?",opts:["Din va ilohiyotning yangi shart-sharoitlarga moslashish usullaridan biri","Yaqin kelajakda adolatli tartib o'rnatish uchun xudoning elchisi kelishi haqidagi ta'limot","Ozgina bo'lsada chetga chiqishni to'liq inkor qiladigan ta'limotga sodiqqlik","Biror dinga e'tiqod qiluvchilarning uyushmasi"],ans:0,cat:"Asoslar"},
+  {q:"Vijdon erkinligi mohiyati nima?",opts:["Aqlning diniy qoidalarni erkin tanqidiy ko'rib chiqishi","Diniy normalarga muvofiq talablarni amalga oshiruvchi individning harakati","Tinchlikni passiv targ'ib qilishga asoslangan siyosiy oqim dini turi","Insonning o'z dunyoqarash mavqeini, shu jumladan dinga munosabatini ham erkin tanlashi"],ans:3,cat:"Asoslar"},
+  {q:"Dinning eng asosiy o'ziga xos xususiyati nima?",opts:["Oxiratga ishonch","G'ayritabiiy kuchlarga ishonch","Narigi dunyoga ishonch","Olamning yaratilganiga ishonch"],ans:1,cat:"Asoslar"},
+  {q:"Jahon dinlarining qaysi g'oyasi ularning turli xalqlar o'rtasida keng tarqalishiga olib keldi?",opts:["Narigi dunyoda mukofotlash g'oyasi","Hammaning Xudo oldida tengligi g'oyasi","Oxirat haqidagi g'oya","Jannat va do'zax haqidagi g'oya"],ans:1,cat:"Jahon dinlari"},
+  {q:"Diniy ibodat nima?",opts:["G'ayritabiiy kuchlarga ishonchsizlik tufayli paydo bo'lgan hissiyotlar yig'indisi","Diniy tasavvurlar sistemasi bilan bog'langan maxsus marosimlar va tantanalar yig'indisi","Diniy e'tiqodlar va marosimlar umumiyligi bo'lmagan asosda paydo bo'lgan uyushma","G'ayritabiiy kuchlarga ishonchsizlik tufayli paydo bo'lgan g'oyalar yig'indisi"],ans:1,cat:"Asoslar"},
+  {q:"Dinning ibtidoiy shakllari qaysilar?",opts:["Magiya, Yahudiylik, jaynizm, zardushtiylik","Fetishizm, buddaviylik, qabila boshliqlarining shaxsiga sig'inish, islom","Nasroniylik, totemizm, sintoizm, tabiatni ilohiylashtirish","Fetishizm, totemizm, magiya, animizm"],ans:3,cat:"Ibtidoiy dinlar"},
+  {q:"Odamlar guruhi bilan hayvon va o'simliklarning muayyan turi o'rtasida tabiiy aloqadorlik, qon-qarindoshlik borligi haqidagi ishonch qaysi dinning xususiyati?",opts:["Fetishizm","Animizm","Magiya","Totemizm"],ans:3,cat:"Ibtidoiy dinlar"},
+  {q:"Uru-qabila dinlarining o'ziga xos xususiyatlari qaysilar?",opts:["Ular muayyan etnik umumiylik chegarasidan chiqmaydi","Ularda magiyaga oid va animistik e'tiqodlar, totemizm va fetishizm unsurlari bor","Ular millatidan qat'i nazar barcha xalqlarga qaratilgan","Ular monoteistik dinlardir"],ans:1,cat:"Ibtidoiy dinlar"},
+  {q:"Asosan bir millat va elat vakillari qanday dinga e'tiqod qiladi?",opts:["Dunyoviy","Uru-qabila","Yakkaxudolik","Milliy"],ans:3,cat:"Asoslar"},
+  {q:"Hinduiylik dinining asosiy xudolari qaysilar?",opts:["Shan-di, Lao-Szi, Pan-gu","Jinna, Nanak, Gaumata","Amaterasu, Yahve, Alloh","Braxma, Vishnu, Shiva"],ans:3,cat:"Hinduizm"},
+  {q:"Sintoizm din sifatida qachon shaklillandi?",opts:["Eramizning 6-7 asrlarida","Eramizning 3-4 asrlarida","Eramizning 1-2 asrlarida","Eramizgacha 4-3 asrlarida"],ans:0,cat:"Milliy dinlar"},
+  {q:"XIII asrda bidat (yeres) bilan kurashish uchun tuzilgan katolik cherkovi tribunali nima deb ataladi?",opts:["Indulgensiya","Inkvizitsiya","Inauguratsiya","Konklav"],ans:1,cat:"Xristianlik"},
+  {q:"Protestantlik ta'limotining bosh xususiyati nima?",opts:["Ibodatlarning soddalashtirilganligi","Xudoning onasi Bibi Maryamni ilohiylashtirish","Ruhoniylarni xudo va odamlar o'rtasidagi vositachi deb e'lon qilish","Shaxsiy e'tiqod qoidasi, umumiy ruhoniylik qoidasi, injilning muqaddasligi"],ans:3,cat:"Xristianlik"},
+  {q:"Qur'on suralari qanday qismlarga bo'linadi?",opts:["Katta va kichik","Dastlabki va yangi","Qonuniy va noqonuniy","Makka va Madina suralari"],ans:3,cat:"Islom"},
+  {q:"Islomda diniy marosimlarni olib boruvchi ruhoniy qanday ataladi?",opts:["Xalifa","Hanif","Murshid","Imom"],ans:3,cat:"Islom"},
+  {q:"1926 yilda qanday xalqaro Islom tashkiloti tuzilgan?",opts:["Islom olami Ligasi (IOL)","Islom Olami Kongressi (IOK)","Jahon Islom Tashkiloti (JIT)","Yevropa Islom Kengashi (YeIT)"],ans:0,cat:"Islom"},
+  {q:"O'zbekiston Respublikasining «Vijdon erkinligi va diniy tashkilotlar to'g'risida»gi Qonuni qaysi yilda qabul qilingan?",opts:["1990","1992","1977","1991"],ans:0,cat:"O'zbekiston"},
+  {q:"Konfutsiylikning asoschisi kim?",opts:["Pani Gu","Lao Szi","Shan Di","Kun Szi (Konfutsiy)"],ans:3,cat:"Milliy dinlar"},
+  {q:"Islomning sunniylik va shialik bo'linishi qachon ro'y berdi?",opts:["VII asrning boshlarida","VII asrning birinchi yarmida","XI asrda","VII asrning ikkinchi yarmida"],ans:3,cat:"Islom"},
+  {q:"Islom konferensiyasi tashkiloti qachon tuzilgan?",opts:["1969 yil","1926 yil","1962 yil","1973 yil"],ans:0,cat:"Islom"},
+  {q:"Hurfikrlilikning mohiyati nimada?",opts:["Fuqarolarning istalgan dinga e'tiqod qilishlari yoki hech qanday dinga e'tiqod qilmaslik huquqi","Insonning qo'yilgan maqsadga muvofiq o'z-xatti harakatlarini ongli tanlash qobiliyati","Aqlning diniy aqidalarga tanqidiy qarash hamda atrof-olamni dinga bog'liq bo'lmagan holda o'rganish huquqini e'lon qiluvchi g'oyaviy yo'nalish","Tabiat, materiya va borliqning birlamchiligi va ong ikkilamchiligidan kelib chiquvchi falsafiy yo'nalish"],ans:2,cat:"Asoslar"},
+  {q:"Mashhur «Tib qonuni» asarining muallifi kim?",opts:["Gippokrat","Ibn Rushd","I.P.Pavlov","Ibn Sino"],ans:3,cat:"O'zbekiston"},
+  {q:"«Xristianlikning mohiyati», «Dinning mohiyati» kitoblarining muallifi kim?",opts:["Didro","Gegel","Feyerbax","Volter"],ans:2,cat:"Asoslar"},
+  {q:"Diniy kompleksning turli elementlarini yangilash nima deb ataladi?",opts:["Ortodoks","Traditsionalizm","Fundamentalizm","Modernizm"],ans:3,cat:"Asoslar"},
+  {q:"Dahriylikning falsafiy asosi nima?",opts:["Dualizm","Idealizm","Materializm","Agnostitsizm"],ans:2,cat:"Asoslar"},
+  {q:"Vijdon erkinligining asosiy qoidasi nima?",opts:["Fuqarolarning istagan dinga qarab huquqlar berilishi","Hamma dinlarning qonun oldida tengligi","Dinga munosabatidan qat'i nazar fuqarolarning qonun oldida tengligi","Davlatning diniy tashkilotlarning ichki ishlariga aralashmaslik"],ans:2,cat:"O'zbekiston"},
+  {q:"Dinning tarkibiy qismlari nimalar?",opts:["Diniy normalar, qoidalar, an'analar, qadriyatlar","Diniy psixologiya, mafkura, yo'nalishlar, mazhablar","Diniy ishonch, ong, marosimlar, targ'ibot","Diniy tasavvur, kayfiyat, ibodat, tashkilotlar"],ans:3,cat:"Asoslar"},
+  {q:"Diniy tasavvur nima?",opts:["Diniy ishonch va marosimchilikning umumiyligi asosida kelib chiqadigan birlashish","G'ayritabiiy kuchlarga ishonchsizlik tufayli kelib chiquvchi qat'iy belgilangan xatti-harakatlar yig'indisi","G'ayritabiiy kuchlarga ishonchsizlik tufayli paydo bo'lgan his-tuygu va emotsional holatlar yig'indisi","G'ayritabiiy kuchlarga ishonch tufayli paydo bo'lgan g'oyalar va obrazlarning yig'indisi"],ans:3,cat:"Asoslar"},
+  {q:"Qaysi dinlar milliy dinlardan hisoblanadi?",opts:["Katolitsizm, pravoslaviya, protestantlik, lyuteranlik","Fetishizm, totemizm, animizm","Buddaviylik, islom, xristianlik","Hinduiylik, jaynizm, sikxiylik, konfutsiylik"],ans:3,cat:"Milliy dinlar"},
+  {q:"Hinduiylikda ibodatxona nima deb ataladi?",opts:["Cherkov","Masjid","But-xona","Sinagoga"],ans:2,cat:"Hinduizm"},
+  {q:"Buddaviylikning asosiy yo'nalishlari qaysilar?",opts:["Xinayana, shivaizm, jaynizm","Xinayana, maxayana, lamaizm","Sunnalik, shialik, xorijiylik","Pravoslaviya, katolitsizm, lamaizm"],ans:1,cat:"Buddaviylik"},
+  {q:"Xochga mixlangan Iso Masihning «Mo'jizaviy tirilishi»ga bag'ishlangan nasroniylikning eng asosiy bayrami qaysi?",opts:["Troitsa","Pyatidesatnitsa","Rojdestvo Xristovo","Pasxa"],ans:3,cat:"Xristianlik"},
+  {q:"Pravoslaviyaning eng asosiy xususiyatlaridan biri nima?",opts:["Pravoslaviya faqat muqaddas kitob ta'limot manbai deb hisoblanishi","Pravoslaviyada turli marosimlarga katta e'tibor berilishi","Pravoslav cherkovlari yagona boshqarish markaziga ega","Pravoslaviya bu ko'p sonli cherkovlar va sektalar yig'indisidir"],ans:1,cat:"Xristianlik"},
+  {q:"Kishi ruhining, jonining borligiga ishonish qaysi ibtidoiy diniy tasavvurga xos?",opts:["Animizm","Fetishizm","Totemizm","Shomonizm"],ans:0,cat:"Ibtidoiy dinlar"},
+  {q:"Jonsiz narsalar g'ayritabiiy xususiyatga ega deb bilish va ularga sig'inish qaysi ibtidoiy diniy tasavvurga xos?",opts:["Fetishizm","Animizm","Totemizm","Shomonizm"],ans:0,cat:"Ibtidoiy dinlar"},
+  {q:"O'rta asrlarda dinning madaniyatga ta'siri qanday bo'lgan?",opts:["Madaniyatning barcha turlarini (ilm-fan, falsafa, huquq, axloq, san'at) o'zida mujassamlashtirgan","Arxitektura, adabiyot va falsafagagina kuchli ta'sir o'tkazgan","Madaniyat va san'atgagina ta'sir o'tkazgan","Ma'naviyatning bir turi va ma'naviy madaniyatning tarkibiy qismi bo'lgan"],ans:0,cat:"Asoslar"},
+  {q:"Vatikan teokratik davlati qachon paydo bo'lgan?",opts:["1870","1054","1526","1929"],ans:3,cat:"Xristianlik"},
+  {q:"Fuqarolarning dinga e'tiqod qilish yoki e'tiqod qilmaslikni mustaqil hal qilishlari qanday ataladi?",opts:["Vijdon erkinligi","Burch erkinligi","Qadriyat erkinligi","Fikr erkinligi"],ans:0,cat:"O'zbekiston"},
+  {q:"'Monoteizm'ning ma'nosi nima?",opts:["Yakkaxudolik","Ko'pxudolik","Diniy ta'limot","Diniy mutaassiblik"],ans:0,cat:"Asoslar"},
+  {q:"Dinning ko'zga ko'rinuvchi, tashqarida aks etuvchi jihatlarini o'rganuvchi ilm sohasi nima deyiladi?",opts:["Din fenomenologiyasi","Din sosiologiyasi","Din falsafasi","Din psixologiyasi"],ans:0,cat:"Asoslar"},
+  {q:"Jahon dinlarining xronologik jihatdan paydo bo'lishi to'g'ri ko'rsatilgan qatorni toping?",opts:["Buddaviylik, xristianlik, islom","Xristianlik, buddaviylik, islom","Islom, xristianlik, buddaviylik","Buddaviylik, islom, xristianlik"],ans:0,cat:"Jahon dinlari"},
+  {q:"O'rta Osiyodagi qaysi davlatda Budda dini asosiy (hukmron) din edi?",opts:["Kushon","Qang","Dovon","Xorazm"],ans:0,cat:"Buddaviylik"},
+  {q:"Millat dinlari...",opts:["Yahudiylik, konfusiylik, sintoizm","Buddizm, xristianlik, islom","Konfusiylik, zardushtiylik, buddizm","Hinduizm, braxmanizm, xristianlik"],ans:0,cat:"Milliy dinlar"},
+  {q:"O'zbekiston Respublikasi birinchi Prezidenti farmoni bilan Toshkent islom universiteti qaysi yilda ochildi?",opts:["1999 yil","1998 yil","2000 yil","1997 yil"],ans:0,cat:"O'zbekiston"},
+  {q:"Ibtidoiy dinlar ko'rinishini aniqlang?",opts:["Totemizm, fetishizm, animizm","Bobizm, kuminizm, lamanizm, jaynizm","Fetishizm, animizm, jaynizm, sintoizm","Hinduiylik, animizm, sikhizm"],ans:0,cat:"Ibtidoiy dinlar"},
+  {q:"Qaysi muqaddas kitobda tuproq, suv, havo, olov muqaddaslashtirilgan?",opts:["Avesto","Qur'oni Karim","Injil","Tavrot"],ans:0,cat:"Zardushtiylik"},
+  {q:"Diniy bag'rikenglik bu...",opts:["Barcha dinlarga sabr-toqat, hurmat bilan munosabatda bo'lish","Diniy hamkorlik barcha muammoni yechadi","Hamma diniy qoidalar asosli degani","Dunyoviy haqiqatlarga amal qilish"],ans:0,cat:"Asoslar"},
+  {q:"Xususiy tartibda diniy ta'lim berish...",opts:["Man etiladi","Qonunda bor","Mumkin","Ruxsat bilan amalga oshiriladi"],ans:0,cat:"O'zbekiston"},
+  {q:"Diniy tashkilotlar xayriya va mehr-muruvvat faoliyatini amalga oshirishga...",opts:["Haqlidir","Ba'zan mumkin","Ayrim hollarda haqlidir","Ijozat berilmaydi"],ans:0,cat:"O'zbekiston"},
+  {q:"Qaysi qadimgi davlatda vafot etgan podshohlar mumiyolangan va ular to hozirgi kunga qadar saqlanib kelinmoqda?",opts:["Qadimgi Misrda","Qadimgi Yunonistonda","Qadimgi Xitoyda","Qadimgi Rimda"],ans:0,cat:"Asoslar"},
+  {q:"Yahudiylik dinining qadimiy oqimlari.",opts:["Saduqiylar, Farziylar, Yesseylar","Saduqiylar, Massonizm, Sionizm","Yesseylar, Braxmanlar, Kshatrilar","Xorijiylar, Ismoiliylar, Saduqiylar, Farziylar"],ans:0,cat:"Yahudiylik"},
+  {q:"Quyidagi dinlardan qaysi biri dastlabki paytlarda 'xudosizlar dini' bo'lgan?",opts:["Buddizm","Zardushtiylik","Iudaizm","Braxmanizm"],ans:0,cat:"Buddaviylik"},
+  {q:"Hinduiylik ta'limotiga ko'ra nechta kastaga bo'linadi?",opts:["4 ta","6 ta","8 ta","10 ta"],ans:0,cat:"Hinduizm"},
+  {q:"Hinduiylik ta'limotiga ko'ra savdogarlar, hunarmandlar, dehqonlar qaysi kastaga kirgan?",opts:["Vayshiylar","Shudriylar","Kashtariylar","Braxmanlar"],ans:0,cat:"Hinduizm"},
+  {q:"Zardushtiylik ta'limotida yaxshilik xudosi nima deb atalgan?",opts:["Axuramazda","Axriman","Mitra","Anaxita"],ans:0,cat:"Zardushtiylik"},
+  {q:"Kun-Tszi qachon va qayerda yashagan?",opts:["Mil.avv. 551-479 yillar Xitoyda","Mil.avv. 331-279 yillar Hindistonda","Mil.avv. 551-479 yillar Yaponiyada","Mil.avv. 331-279 yillar Koreyada"],ans:0,cat:"Milliy dinlar"},
+  {q:"Konfutsiychiligining manbai qaysi kitob bo'lgan?",opts:["Lung-Yuy","Beda","Rigveda","Dao-Detszin"],ans:0,cat:"Milliy dinlar"},
+  {q:"Daosizm qachon paydo bo'ldi?",opts:["Mil.avv. IV-III asrlarda","Mil.avv. II-III asrlarda","Mil.avv. I-II asrlarda","Eramizdan avval VI asrda"],ans:0,cat:"Milliy dinlar"},
+  {q:"Hinduiylikda braxmanlikning qaysi xudolari tan olinadi?",opts:["Braxma, Vishnu, Shiva","Braxma, Indra, Mitra","Adita, Krishna","Varuna, Adita, Agnu"],ans:0,cat:"Hinduizm"},
+  {q:"Iudaizmda ibodatxona nima deb nomlanadi?",opts:["Sinagoga","Monastr","Cherkov","Masjid"],ans:0,cat:"Yahudiylik"},
+  {q:"Yaponiya davlatining qadimiy milliy dini?",opts:["Sintoizm","Buddizm","Daosizm","Lamaizm"],ans:0,cat:"Milliy dinlar"},
+  {q:"Bibliyaning yahudiylar muqaddas deb e'tirof etgan qismi qaysi?",opts:["Eski Ahd","Yangi Ahd","Talmud","Tripitaka"],ans:0,cat:"Yahudiylik"},
+  {q:"Zardushtiylik dinining vatani qaysi hududlar kiradi?",opts:["Markaziy Osiyo va Eron","Afrika va Lotin Amerikasi","Hindiston va Xitoy","Misr va Vizantiya"],ans:0,cat:"Zardushtiylik"},
+  {q:"Daosizm dinining vatani?",opts:["Qadimgi Xitoy","Qadimgi Misr","Qadimgi Hindiston","Qadimgi Yunoniston"],ans:0,cat:"Milliy dinlar"},
+  {q:"Avesto ning 12000 qoramol terisiga yozilgan haqidagi manba kimning qalamiga mansub?",opts:["Abu Rayhon Beruniy — «O'tmish xalqlardan qolgan yodgorliklar»","Ibn Sino — Donishnoma","Abu Nasr Farobiy — Fozil odamlar shahri","Burhoniddin Marginoniy — Hidoya"],ans:0,cat:"Zardushtiylik"},
+  {q:"Tavrot va Talmud qaysi dinning muqaddas kitobi bo'lib hisoblanadi?",opts:["Yahudiylik","Hinduiylik","Jaynizm","Sintoizm"],ans:0,cat:"Yahudiylik"},
+  {q:"Musulmonlar e'tiqodicha, xudo tomonidan Dovud payg'ambarga yuborilgan muqaddas kitob?",opts:["Zabur","Tavrot","Talmud","Qur'oni Karim"],ans:0,cat:"Islom"},
+  {q:"Islomga qadar Markaziy Osiyoda hukm surgan din?",opts:["Zardushtiylik","Yudaizm","Konfutsiychilik","Braxmanchilik"],ans:0,cat:"Zardushtiylik"},
+  {q:"Hinduiylik ko'p xudolik dini bo'lib, braxmanlikning asosan qaysi xudolarini tan oladi?",opts:["Braxma, Vishnu, Shiva","Shiva, Mitra, Braxma","Indra, Varuna, Mitra","Vishnu, Indra, Krishna"],ans:0,cat:"Hinduizm"},
+  {q:"Zardushtiylik dinida muqaddas hisoblangan to'rt unsurga nimalar kiradi?",opts:["Suv, olov, yer va havo","Tuproq, suv, havo va oy","Quyosh, oy, suv va havo","Havo, tuproq, oy va quyosh"],ans:0,cat:"Zardushtiylik"},
+  {q:"Buddizming asosiy kitobi...",opts:["Tripitaka","Tavrot","Avesto","Injil"],ans:0,cat:"Buddaviylik"},
+  {q:"Budda so'zining ma'nosini aniqlang?",opts:["Nurlagan","Buyuklik, donolik","Sokinlik, saroblilik","Soflik, insonparvarlik"],ans:0,cat:"Buddaviylik"},
+  {q:"Buddaviylik dinida «Qiynoqlarning sabablari mavjudligi» haqidagi ta'limot nechanchi haqiqatda berilgan?",opts:["Ikkinchi haqiqat","Uchinchi haqiqat","Birinchi haqiqat","To'rtinchi haqiqat"],ans:0,cat:"Buddaviylik"},
+  {q:"Buddaviylik ta'limotiga ko'ra insonning qayta tug'ilishdan to'xtash holati qanday nomlanadi?",opts:["Nirvana","Dxarma","Meditasiya","Karma"],ans:0,cat:"Buddaviylik"},
+  {q:"Budda o'z ta'limotini Hindistonning turli joylariga necha yil mobaynida yetkazadi?",opts:["40 yil davomida","30 yil davomida","49 yil davomida","80 yil davomida"],ans:0,cat:"Buddaviylik"},
+  {q:"«Xinayana» oqimi buddaviylikda qanday ma'noni anglatadi?",opts:["Kichik gildirak","Katta gildirak","Nurlangan","Tantana qiluvchi"],ans:0,cat:"Buddaviylik"},
+  {q:"«Maxayana» oqimi buddaviylikda qanday ma'noni anglatadi?",opts:["Katta gildirak","Tantana qiluvchi","Kichik gildirak","Donishmand"],ans:0,cat:"Buddaviylik"},
+  {q:"Jahonda e'tiqod qiluvchilar soni jihatidan eng katta milliy din...",opts:["Yahudiylik","Sintoizm","Konfusiylik","Hinduizm"],ans:3,cat:"Milliy dinlar"},
+  {q:"Jahonshumullik (kosmopolitizm) qaysi dinlar uchun xarakterli?",opts:["Uru-qabilaviy","Milliy","Jahon","Dastlabki"],ans:2,cat:"Jahon dinlari"},
+  {q:"Protestant cherkovi va sektalarining xristianlik marosimlarini qaysilarini e'tirof etadi?",opts:["Miro surtish va ruhoniylik","Cho'qintirish va poklanish","Nikoh va dafn qilish","Yel surtish va cho'qintirish"],ans:1,cat:"Xristianlik"},
+  {q:"Islom olami ligasi qachon va qayerda tuzilgan?",opts:["1969 yil Jiddada","1964 yil Jakartada","1926 yil Makkada","1962 yil Makkada"],ans:2,cat:"Islom"},
+  {q:"Hozirgi zamon islom dinida asosiy g'oyaviy yo'nalishlar qaysilar?",opts:["Modernistik va ortodoksal","Fatalistik va revizionistik","Qarmatiylik va xavorijlar","Revanshistik va traditsionalistik"],ans:0,cat:"Islom"},
+  {q:"'Antiklerikalizm' nima?",opts:["Cherkovning rasmiy doktrinasidan farq qiluvchi diniy ta'limot","Dinning u yoki bu qoidalarini shubha ostiga olish","Diniy tasavvurlar va umuman dinni inkor qiluvchi qarashlar","Siyosiy va ijtimoiy hayotni din va cherkov hukmronligidan qutqarishga qaratilgan ijtimoiy harakat"],ans:3,cat:"Asoslar"},
+  {q:"Sikxiylikning muqaddas kitobi qaysi?",opts:["Injil","Adigrantx","Qur'on","Vedalar"],ans:1,cat:"Milliy dinlar"},
+  {q:"Nasroniylikning bosh ibodati qaysi?",opts:["Nasroniy avliyolarga sig'inish","Liturgiya","Injilni muqaddas deb bilish","Cherkovni muqaddas deb bilish"],ans:1,cat:"Xristianlik"},
+  {q:"O'zbekiston Konstitutsiyasining qaysi moddasida fuqarolarning vijdon erkinligi huquqi e'lon qilingan?",opts:["18 moddasida","57-moddasida","40-moddasida","35-moddasida"],ans:3,cat:"O'zbekiston"},
+  {q:"Nasroniylikning o'g'il xudo Iso Masihga e'tiqod qilish bilan bog'liq asosiy aqidasi qaysi?",opts:["Cho'qintirish, poklanish, miro surtish, tavba qilish","Ruhning o'lmasligiga ishonch va samoviy taqdirlanish g'oyasi","Xudoning gavdalanishi, gunohni yuvish, qayta tirilish, osmonga chiqib-tushish","Bir vaqtning o'zida uch yuzli: ota xudo, o'g'il xudo va muqaddas ruh bo'lgan yagona xudoga ishonish"],ans:2,cat:"Xristianlik"},
+  {q:"Protestantlikning qaysi yo'nalishida Iso Masih xochga emas ustunga mixlangan deb e'tiqod qilinadi?",opts:["Adventizm","Iegova Shohidlari","Pyatidesyatniklik","Lyuteranlik"],ans:1,cat:"Xristianlik"},
+  {q:"O'zbekiston Respublikasi Konstitutsiyasining qaysi moddasi vijdon erkinligi masalasiga bag'ishlangan?",opts:["117 modda","56 modda","35 modda","14 modda"],ans:2,cat:"O'zbekiston"},
+  {q:"Milliy dinlarning o'ziga xos jihatlari nimalar?",opts:["Odamlar guruhi va hayvonlarning muayyan turi o'rtasidagi g'ayritabiiy aloqalar borligiga ishonch","Hammaning xudo oldida tengligini targ'ib qilish","Odamlar g'ayritabiiy xususiyatlarga ega deb hisoblangan voqelikning turli ob'ektlarini ilohiylashtirish","Kishilar kundalik hayotining rasm-rusumlashtirilishi, o'ziga xos marosimchilik, diniy talablar va taqiqlar tizimi"],ans:3,cat:"Milliy dinlar"},
+  {q:"Feodalizm davrida hurfikrlilik qanday sharoitlarda namoyon bo'lgan?",opts:["Jamiyatning demokratik rivojlanishi sharoitida","Jamiyatda dahriy dunyoqarashning hukmronligi sharoitida","Din va cherkovning ijtimoiy hayotning hamma sohalardagi hukmronligi sharoitida","Ijtimoiy hayotning barcha sohalarida vijdon erkinligi qoidalariga amal qilish sharoitida"],ans:2,cat:"Asoslar"},
+  {q:"Islomni modernizatsiya qilishning mohiyati nima?",opts:["Musulmon ilohiyotining yo'nalishi","Qur'on tafsiri, sharhi","Islom marosimchiligining asosini tashkil qiluvchi an'anaviy xatti-harakatlar majmuasi","Musulmon mafkurasi va diniy amallarni davr, mamlakat sharoitlariga moslashtirish"],ans:3,cat:"Islom"},
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let qs=[],cur=0,correct=0,wrong=0,skipped=0,answered={},bookmarks=new Set(),lastWrongIdxs=[],timerInterval=null,timerSec=0,timerPaused=false,selectedMode='all',quizRunning=false;
+
+// ─── UTILITIES ──────────────────────────────────────────────────────────────
+function shuffle(a){let r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+function showTab(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('active');
+  if(id==='bookmarks')renderBookmarks();
+  if(id==='review')renderReview();
+}
+function showToast(msg,dur=2200){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
+function $id(id){return document.getElementById(id)}
+
+// ─── THEME ──────────────────────────────────────────────────────────────────
+let isLight=false;
+function toggleTheme(){isLight=!isLight;document.body.classList.toggle('light-mode',isLight);$id('btnTheme').textContent=isLight?'☀️':'🌙'}
+
+// ─── MODE SELECTION ─────────────────────────────────────────────────────────
+function selMode(el,mode){
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');selectedMode=mode;
+}
+
+// ─── QUIZ START ─────────────────────────────────────────────────────────────
+function startQuiz(){
+  let pool=[];
+  if(selectedMode==='all') pool=shuffle(ALL_Q);
+  else if(selectedMode==='50') pool=shuffle(ALL_Q).slice(0,50);
+  else if(selectedMode==='25') pool=shuffle(ALL_Q).slice(0,25);
+  else if(selectedMode==='bookmarked'){
+    pool=ALL_Q.filter((_,i)=>bookmarks.has(i));
+    if(!pool.length){showToast('⭐ Hali bookmark yo\'q!');return}
+    pool=shuffle(pool);
+  }
+  else if(selectedMode==='wrong'){
+    pool=lastWrongIdxs.map(i=>ALL_Q[i]);
+    if(!pool.length){showToast('✅ Hali xato yo\'q!');return}
+    pool=shuffle(pool);
+  }
+
+  qs=pool;cur=0;correct=0;wrong=0;skipped=0;answered={};quizRunning=true;
+  showTab('quiz');
+  buildMinimap();
+  if($id('showMap').checked) $id('minimap').classList.add('open');
+  loadQ();
+  startTimer();
+}
+
+// ─── TIMER ──────────────────────────────────────────────────────────────────
+function startTimer(){
+  clearInterval(timerInterval);timerPaused=false;
+  const total=parseInt($id('timerSelect').value)||0;
+  if(!total){$id('timerChip').style.display='none';return}
+  $id('timerChip').style.display='flex';
+  timerSec=total;updateTimerUI();
+  timerInterval=setInterval(()=>{
+    if(timerPaused)return;
+    if(answered[cur]!==undefined){timerSec=total;updateTimerUI();return}
+    timerSec--;
+    updateTimerUI();
+    if(timerSec<=0){clearInterval(timerInterval);autoTimeout();}
+  },1000);
+}
+function updateTimerUI(){
+  const tc=$id('timerChip');
+  const total=parseInt($id('timerSelect').value)||30;
+  tc.textContent='⏱ '+timerSec+'s';
+  tc.className='timer-chip '+(timerSec<=5?'warn':'ok');
+}
+function autoTimeout(){
+  if(answered[cur]!==undefined)return;
+  answered[cur]=-1;skipped++;
+  revealAnswer(-1);
+  $id('nextBtn').disabled=false;
+  showToast('⏰ Vaqt tugadi!');
+}
+function pauseTimer(){
+  timerPaused=!timerPaused;
+  $id('btnPause').textContent=timerPaused?'▶ Davom':'⏸ Pauza';
+  $id('btnPause').classList.toggle('on',timerPaused);
+  showToast(timerPaused?'⏸ Pauza':'▶ Davom etildi');
+}
+
+// ─── LOAD QUESTION ──────────────────────────────────────────────────────────
+function loadQ(dir){
+  const q=qs[cur],total=qs.length;
+  $id('qNum').textContent=`Savol ${cur+1} / ${total}`;
+  $id('qCategory').textContent=q.cat||'';
+  $id('qText').textContent=q.q;
+  $id('progFill').style.width=((cur/total)*100)+'%';
+  $id('sc1').textContent=cur+1;
+  $id('sc2').textContent=correct;
+  $id('sc3').textContent=wrong;
+  $id('bmStar').textContent=bookmarks.has(ALL_Q.indexOf(q))?'★':'☆';
+  $id('bmStar').style.color=bookmarks.has(ALL_Q.indexOf(q))?'var(--gold)':'var(--muted)';
+
+  const opts=document.getElementById('opts');opts.innerHTML='';
+  const letters=['A','B','C','D'];
+  let optList=[...q.opts];
+  let mapping=[0,1,2,3];
+  if($id('shuffleOpts').checked&&answered[cur]===undefined){
+    const combined=optList.map((o,i)=>({o,i}));
+    const shuf=shuffle(combined);
+    optList=shuf.map(x=>x.o);
+    mapping=shuf.map(x=>x.i);
+  }
+
+  optList.forEach((opt,i)=>{
+    const origIdx=mapping[i];
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML=`<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick=()=>selectAns(origIdx,btn,mapping);
+    if(answered[cur]!==undefined){
+      btn.disabled=true;
+      if(origIdx===q.ans) btn.classList.add(answered[cur]===origIdx?'correct':'reveal');
+      if(answered[cur]===origIdx&&origIdx!==q.ans) btn.classList.add('wrong');
+      if(answered[cur]===-1&&origIdx===q.ans) btn.classList.add('reveal');
+    }
+    opts.appendChild(btn);
+  });
+
+  const fb=$id('feedback');
+  fb.className='feedback';
+  $id('expl').className='expl';
+  if(answered[cur]!==undefined){
+    const wasCorrect=answered[cur]===q.ans;
+    showFeedback(wasCorrect,q.opts[q.ans],answered[cur]===-1);
+  }
+
+  $id('nextBtn').disabled=answered[cur]===undefined;
+  $id('prevBtn').disabled=cur===0;
+
+  const card=$id('qCard');
+  card.style.animation='none';card.offsetHeight;
+  card.style.animation=(dir==='back'?'slideBack':'slideIn')+' 0.3s ease';
+
+  updateMinimap();
+  resetTimerForNewQ();
+}
+
+function resetTimerForNewQ(){
+  const total=parseInt($id('timerSelect').value)||0;
+  if(!total)return;
+  timerSec=total;updateTimerUI();timerPaused=false;
+  $id('btnPause').textContent='⏸ Pauza';$id('btnPause').classList.remove('on');
+}
+
+// ─── SELECT ANSWER ───────────────────────────────────────────────────────────
+function selectAns(origIdx,clickedBtn,mapping){
+  if(answered[cur]!==undefined)return;
+  const q=qs[cur];
+  answered[cur]=origIdx;
+  const allBtns=document.querySelectorAll('.opt');
+  allBtns.forEach(b=>b.disabled=true);
+  revealAnswer(origIdx);
+  if(origIdx===q.ans) correct++;
+  else{wrong++;lastWrongIdxs.push(ALL_Q.indexOf(q));}
+  $id('sc2').textContent=correct;$id('sc3').textContent=wrong;
+  $id('nextBtn').disabled=false;
+  updateMinimap();
+}
+function revealAnswer(chosen){
+  const q=qs[cur];
+  const allBtns=document.querySelectorAll('.opt');
+  const letters=['A','B','C','D'];
+  allBtns.forEach(btn=>{
+    const letter=btn.querySelector('.opt-letter').textContent;
+    const li=letters.indexOf(letter);
+    // find orig index for this button position - use a data attribute approach via re-reading
+  });
+  // Re-apply classes based on answered state
+  allBtns.forEach((btn)=>{
+    const txt=btn.querySelector('span:last-child').textContent;
+    const origIdx=q.opts.indexOf(txt);
+    if(origIdx===q.ans) btn.classList.add(chosen===origIdx?'correct':'reveal');
+    if(chosen===origIdx&&origIdx!==q.ans) btn.classList.add('wrong');
+    if(chosen===-1&&origIdx===q.ans) btn.classList.add('reveal');
+  });
+  const isCorrect=chosen===q.ans;
+  const timedOut=chosen===-1;
+  showFeedback(isCorrect,q.opts[q.ans],timedOut);
+}
+function showFeedback(isCorrect,correctOpt,timedOut=false){
+  const fb=$id('feedback');
+  if(timedOut){
+    fb.className='feedback show w';
+    $id('fbIcon').textContent='⏰';
+    $id('fbText').textContent='Vaqt tugadi! To\'g\'ri javob: '+correctOpt;
+  }else if(isCorrect){
+    fb.className='feedback show c';
+    $id('fbIcon').textContent='✓';
+    $id('fbText').textContent='To\'g\'ri javob! Ajoyib!';
+  }else{
+    fb.className='feedback show w';
+    $id('fbIcon').textContent='✗';
+    $id('fbText').textContent='Xato! To\'g\'ri javob: '+correctOpt;
+  }
+  if($id('showExpl').checked&&qs[cur].expl){
+    $id('expl').textContent=qs[cur].expl;$id('expl').className='expl show';
+  }
+}
+
+// ─── NAVIGATION ─────────────────────────────────────────────────────────────
+function navQ(dir){
+  if(dir===1&&cur<qs.length-1){cur++;loadQ('fwd')}
+  else if(dir===1&&cur===qs.length-1){showResults()}
+  else if(dir===-1&&cur>0){cur--;loadQ('back')}
+}
+function skipQuestion(){
+  if(answered[cur]!==undefined)return;
+  answered[cur]=-1;skipped++;
+  const q=qs[cur];
+  document.querySelectorAll('.opt').forEach((btn)=>{
+    const txt=btn.querySelector('span:last-child').textContent;
+    const origIdx=q.opts.indexOf(txt);
+    btn.disabled=true;
+    if(origIdx===q.ans) btn.classList.add('reveal');
+  });
+  showFeedback(false,q.opts[q.ans],true);
+  $id('nextBtn').disabled=false;
+  updateMinimap();
+  showToast('⏭ O\'tkazib yuborildi');
+}
+function goToNextWrong(){
+  for(let i=cur+1;i<qs.length;i++){
+    if(answered[i]!==undefined&&answered[i]!==-1&&answered[i]!==qs[i].ans){cur=i;loadQ('fwd');return}
+  }
+  showToast('✅ Keyingi xato yo\'q');
+}
+
+// ─── MINIMAP ─────────────────────────────────────────────────────────────────
+function buildMinimap(){
+  const g=$id('minimapGrid');g.innerHTML='';
+  qs.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='mm-dot';d.textContent=i+1;d.id='mm'+i;
+    d.onclick=()=>{cur=i;loadQ()};
+    g.appendChild(d);
+  });
+}
+function updateMinimap(){
+  qs.forEach((q,i)=>{
+    const d=$id('mm'+i);if(!d)return;
+    d.className='mm-dot'+(i===cur?' current':'');
+    const a=answered[i];
+    if(a!==undefined){
+      if(a===-1) d.classList.add('answered-w');
+      else if(a===q.ans) d.classList.add('answered-c');
+      else d.classList.add('answered-w');
+    }
+  });
+}
+function toggleMap(){
+  const m=$id('minimap');m.classList.toggle('open');$id('btnMap').classList.toggle('on');
+}
+
+// ─── BOOKMARK ────────────────────────────────────────────────────────────────
+function toggleBookmark(){
+  const q=qs[cur];const origIdx=ALL_Q.indexOf(q);
+  if(bookmarks.has(origIdx)){bookmarks.delete(origIdx);$id('bmStar').textContent='☆';$id('bmStar').style.color='var(--muted)';showToast('☆ Bookmark olib tashlandi')}
+  else{bookmarks.add(origIdx);$id('bmStar').textContent='★';$id('bmStar').style.color='var(--gold)';showToast('★ Bookmark saqlandi!')}
+  $id('bmCount').textContent=bookmarks.size;
+}
+function renderBookmarks(){
+  const c=$id('bookmarkContent');
+  if(!bookmarks.size){c.innerHTML='<div class="bookmark-empty">⭐ Hali hech qanday savol saqlanmagan.<br><small>Test paytida ★ belgisini bosing</small></div>';return}
+  const items=[...bookmarks].map(i=>{const q=ALL_Q[i];return`<div class="bm-item"><div><div class="bm-item-num">Savol ${i+1} · ${q.cat}</div><div class="bm-item-q">${q.q}</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="bm-go" onclick="jumpToBookmark(${i})">→ O'tish</button><button class="bm-del" onclick="removeBookmark(${i})">✕</button></div></div>`}).join('');
+  c.innerHTML='<div class="bookmark-list">'+items+'</div>';
+}
+function removeBookmark(i){bookmarks.delete(i);$id('bmCount').textContent=bookmarks.size;renderBookmarks();showToast('Olib tashlandi')}
+function jumpToBookmark(origIdx){
+  showTab('quiz');
+  const qi=qs.findIndex(q=>ALL_Q.indexOf(q)===origIdx);
+  if(qi>=0){cur=qi;loadQ();}
+}
+
+// ─── RESULTS ─────────────────────────────────────────────────────────────────
+function showResults(){
+  clearInterval(timerInterval);quizRunning=false;
+  const total=qs.length;
+  const pct=Math.round((correct/total)*100);
+  $id('rPct').textContent=pct+'%';
+  $id('rC').textContent=correct;$id('rW').textContent=wrong;$id('rT').textContent=total;$id('rSkip').textContent=skipped;
+
+  // Arc
+  const circ=2*Math.PI*60;
+  const offset=circ-(circ*pct/100);
+  $id('resultArc').style.strokeDashoffset=offset;
+
+  let title,sub,emoji='';
+  if(pct>=90){title='Ustoz darajasi! 🏆';sub='Siz din tarixi bo\'yicha ajoyib bilimga egasiz!'}
+  else if(pct>=75){title='A\'lo natija! 🌟';sub='Zo\'r! Yana bir oz mashq bilan mukammal bo\'lasiz.'}
+  else if(pct>=60){title='Yaxshi natija! 👍';sub='Ko\'proq takrorlash tavsiya etiladi.'}
+  else if(pct>=40){title='O\'rtacha natija 📚';sub='Materialni qayta o\'rganib, yana sinab ko\'ring.'}
+  else{title='Yana urinib ko\'ring! 💪';sub='Tushunib olmagan mavzularga qaytib, qayta o\'rganing.'}
+
+  $id('rTitle').textContent=title;$id('rSub').textContent=sub;
+
+  // Breakdown by category
+  const cats={};
+  qs.forEach((q,i)=>{
+    const cat=q.cat||'Boshqa';
+    if(!cats[cat]) cats[cat]={total:0,correct:0};
+    cats[cat].total++;
+    if(answered[i]===q.ans) cats[cat].correct++;
+  });
+  const bdWrap=$id('breakdown');const bdRows=$id('bdRows');bdRows.innerHTML='';
+  Object.entries(cats).sort((a,b)=>b[1].total-a[1].total).forEach(([cat,d])=>{
+    const p=Math.round((d.correct/d.total)*100);
+    bdRows.innerHTML+=`<div class="bd-row"><span style="width:110px;font-size:12px;font-weight:600;color:var(--muted)">${cat}</span><div class="bd-bar-bg"><div class="bd-bar-fill" style="width:${p}%"></div></div><span class="bd-pct">${p}%</span><span style="font-size:11px;color:var(--muted);width:50px;text-align:right">${d.correct}/${d.total}</span></div>`;
+  });
+  if(Object.keys(cats).length>1) bdWrap.style.display='block';
+
+  showTab('results');
+}
+
+// ─── REVIEW WRONG ────────────────────────────────────────────────────────────
+function renderReview(){
+  const c=$id('reviewContent');
+  const wrongs=qs.map((q,i)=>({q,i,a:answered[i]})).filter(x=>x.a!==undefined&&x.a!==x.q.ans);
+  if(!wrongs.length){c.innerHTML='<div class="bookmark-empty">✅ Hech qanday xato yo\'q yoki hali test yakunlanmagan.</div>';return}
+  const html=wrongs.map(({q,i,a})=>`<div class="rev-card"><div class="rev-num">Savol ${i+1} · ${q.cat}</div><div class="rev-q">${q.q}</div><div class="rev-correct"><span class="rev-dot" style="background:var(--green)"></span>To'g'ri: ${q.opts[q.ans]}</div>${a>=0?`<div class="rev-your"><span class="rev-dot" style="background:var(--rose)"></span>Sizning: ${q.opts[a]}</div>`:''}</div>`).join('');
+  c.innerHTML='<div class="review-list">'+html+'</div>';
+}
+
+// ─── SEARCH ──────────────────────────────────────────────────────────────────
+function openSearch(){$id('searchModal').classList.add('open');$id('searchInput').value='';$id('searchResults').innerHTML='';setTimeout(()=>$id('searchInput').focus(),100)}
+function closeSearch(e){if(e.target===$id('searchModal'))$id('searchModal').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$id('searchModal').classList.remove('open')});
+function doSearch(){
+  const s=$id('searchInput').value.toLowerCase().trim();
+  const res=$id('searchResults');
+  if(!s){res.innerHTML='';return}
+  const matches=ALL_Q.map((q,i)=>({q,i})).filter(({q,i})=>q.q.toLowerCase().includes(s)||String(i+1)===s||(q.cat&&q.cat.toLowerCase().includes(s))).slice(0,20);
+  if(!matches.length){res.innerHTML='<div style="padding:16px;color:var(--muted);font-size:13px">Hech narsa topilmadi.</div>';return}
+  res.innerHTML=matches.map(({q,i})=>`<div class="search-item" onclick="goToSearchResult(${i})"><div class="si-num"><span class="search-num-badge">#${i+1}</span>${q.cat||''}</div><div class="si-q">${q.q.substring(0,120)}${q.q.length>120?'...':''}</div></div>`).join('');
+}
+function goToSearchResult(origIdx){
+  $id('searchModal').classList.remove('open');
+  if(!quizRunning){showToast('Avval testni boshlang!');return}
+  const qi=qs.findIndex(q=>ALL_Q.indexOf(q)===origIdx);
+  if(qi>=0){cur=qi;loadQ();showTab('quiz')}
+  else showToast('Bu savol joriy testda yo\'q');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+$id('bmCount').textContent='0';
+</script>
+</body>
+</html>
